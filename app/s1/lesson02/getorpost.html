@@ -1,0 +1,40 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+    <title>getorpst.html</title>
+	
+    <meta http-equiv="keywords" content="keyword1,keyword2,keyword3">
+    <meta http-equiv="description" content="this is my page">
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    
+    <!--<link rel="stylesheet" type="text/css" href="./styles.css">-->
+
+  </head>
+  
+  <body>
+    <!-- 
+	        表单：
+	    	表单 用于向服务器提交数据 
+	    	action表示服务器的链接 用于提交数据的url
+	    	method 决定了进入servlet中的doget（get）和dopost(post)方法
+	    	如果直接在浏览器中输入服务器的链接地址 默认是get方式提交
+	   比较get和post的区别
+	      1 get方式会将数据 直接添加到url上 通过 ?参数名=值&参数名=值的方式  安全性较差 一般不能用于提交机密的数据
+	        post方式是将数据隐藏在http协议内容中提交
+	      2 get和post方式提交的数据的长度
+	         get方式默认的提交最大字符数是 73XX（chrome）38XX(IE)
+	         post方式默认是无限制  大的文件上传使用post提交
+	      3 get方式使用的场合  因为post方式会在http请求中添加一块数据用于存储 所以效率上低于get方式
+	                      当非机密数据 一般的查询 通过id 或者模糊查询 或者 隐藏表单域时 使用get方式   
+     -->
+    <form action="../servlet/loginServlet" method="get">
+    	用户&nbsp;名:  <input name="uname" type="text"/><br/>
+    	密&nbsp;&nbsp;码:  <input name="pwd" type="password" style="margin-top:1px"/><br/>
+        自我介绍：<textarea name="intro" style="margin-top:1px" rows="10" cols="21"></textarea><br/>
+       爱好 ：<input type="checkbox" name="hobby" value="0"/>读书
+       <input type="checkbox" name="hobby"/ value="1">打篮球
+       <input type="checkbox" name="hobby" value="2"/>写代码
+    	<input type="submit" value="提交"/>
+    </form>
+  </body>
+</html>

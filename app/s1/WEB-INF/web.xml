@@ -1,0 +1,254 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app version="2.5" xmlns="http://java.sun.com/xml/ns/javaee"
+ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee   http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
+ <!-- 定义全局的初始化参数 -->
+ <context-param>
+     <param-name>readFile</param-name>
+     <param-value>c:/test/test.txt</param-value>
+ </context-param>
+ 
+<!--lession01servlet -->
+ 
+ <!-- servert 小的服务程序 
+                      可以理解是一个链接
+                       链接应该有url url被请求后 应该被响应 
+                        响应通过servlet的类中doGet和dopost去执行
+   -->
+ <servlet>
+  <!-- servlet-name标识当前servlet的名字 -->
+  <servlet-name>HelloServlet</servlet-name>
+  <!-- url链接的处理的servlet的类 -->
+  <servlet-class>servet.lession01.HelloServlet</servlet-class>
+ </servlet>
+<!-- lession02servlet -->
+ <!-- 用于测试get和post区别 以及乱码问题的servlet -->
+ <servlet>
+  <servlet-name>loginServlet</servlet-name>
+  <servlet-class>servet.lession02.LoginServelt</servlet-class>
+ </servlet>
+ <!-- 用于测试通配符的servlet -->
+  <servlet>
+    <servlet-name>LikeServlet</servlet-name>
+    <servlet-class>servet.lession02.LikeServlet</servlet-class>
+  </servlet>
+<!-- lession03servlet --> 
+ <!-- 用于测试refresh响应头的servlet -->
+  <servlet>
+    <servlet-name>ReServlet</servlet-name>
+    <servlet-class>servet.lession03.RedirectServlet</servlet-class>
+  </servlet>
+  <!-- 用于测试refresh响应头的servlet -->
+  <servlet>
+    <servlet-name>RefServlet</servlet-name>
+    <servlet-class>servet.lession03.RefreshServlet</servlet-class>
+  </servlet>
+  <!-- 用于测试声明周期的servlet -->
+  <servlet>
+    <servlet-name>CycleServlet</servlet-name>
+    <servlet-class>servet.lession03.CycleServlet</servlet-class>
+    <!-- 定义局部的初始化参数文件 -->
+    <init-param>
+    	<param-name>readDir</param-name>
+    	<param-value>c:/test1</param-value>
+    </init-param>
+    <!-- 
+       load-on-startup设置的参数大于等于0时  容器启动时初始化并创建servlet对象
+                  参数小于 0时 在第一次访问servlet时初始化并创建servlet对象
+                  对象是单实例 永远只会被初始化一次
+     -->
+    <load-on-startup>9</load-on-startup>
+  </servlet>
+  <!-- 用于测试客户端跳转的servlet -->
+  <servlet>
+    <servlet-name>ClientRedicter</servlet-name>
+    <servlet-class>servet.lession03.client.ClientRedicter</servlet-class>
+  </servlet>
+  <!-- 用于测试客户端跳转的servlet -->
+  <servlet>
+    <servlet-name>ResultRedicter</servlet-name>
+    <servlet-class>servet.lession03.client.ResultRedicter</servlet-class>
+  </servlet>
+  <!-- 用于测试服务器跳转的servlet -->
+  <servlet>
+    <servlet-name>ServerRedicter</servlet-name>
+    <servlet-class>servet.lession03.server.ServerRedicter</servlet-class>
+  </servlet>
+  <!-- 用于测试服务器跳转的servlet -->
+  <servlet>
+    <servlet-name>ServerResultRedicter</servlet-name>
+    <servlet-class>servet.lession03.server.ResultRedicter</servlet-class>
+  </servlet>
+  <!-- lession04servlet --> 
+  <!-- 设置cookie的servlet -->
+  <servlet>
+    <servlet-name>CookieServlet</servlet-name>
+    <servlet-class>servet.lession04.CookieServlet</servlet-class>
+  </servlet> 
+  <servlet>
+    <servlet-name>ReadCookieServlet</servlet-name>
+    <servlet-class>servet.lession04.ReadCookieServlet</servlet-class>
+  </servlet>
+  <servlet>
+    <servlet-name>UserServlet</servlet-name>
+    <servlet-class>servet.lession05.UserServlet</servlet-class>
+  </servlet>
+  <servlet>
+    <servlet-name>LoginServlet</servlet-name>
+    <servlet-class>servet.lession05.LoginServlet</servlet-class>
+  </servlet>
+  <servlet>
+    <servlet-name>UploadServlet</servlet-name>
+    <servlet-class>servet.lession07.UploadServlet</servlet-class>
+  </servlet>
+  <servlet>
+    <servlet-name>FileUploadServlet</servlet-name>
+    <servlet-class>servet.lession07.FileUploadServlet</servlet-class>
+  </servlet>
+  <servlet>
+    <servlet-name>FileDownServlet</servlet-name>
+    <servlet-class>servet.lession07.FileDownServlet</servlet-class>
+  </servlet>
+  <servlet>
+    <servlet-name>NationServlet</servlet-name>
+    <servlet-class>servet.lession07.NationServlet</servlet-class>
+  </servlet>
+
+
+
+
+
+ 
+ <servlet-mapping>
+  <!-- servlet-name标识当前servlet的名字 -->
+  <servlet-name>HelloServlet</servlet-name>
+  <!-- 请求访问的url -->
+  <url-pattern>/servlet/HelloServlet</url-pattern>
+ </servlet-mapping>
+ <servlet-mapping>
+  <servlet-name>loginServlet</servlet-name>
+  <url-pattern>/servlet/loginServlet</url-pattern>
+ </servlet-mapping>
+ <!-- 
+      /通配符 用于统配所有的 
+      /like/* *用于统配 like/之后所有的字符
+      *.action 以什么字符开头 不能写成 /*.action
+ -->
+  <servlet-mapping>
+    <servlet-name>LikeServlet</servlet-name>
+    <url-pattern>*.action</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>ReServlet</servlet-name>
+    <url-pattern>/reServlet</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>RefServlet</servlet-name>
+    <url-pattern>/refServlet</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>CycleServlet</servlet-name>
+    <url-pattern>/cycleServlet</url-pattern>  
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>ClientRedicter</servlet-name>
+    <url-pattern>/clientRedicter</url-pattern>
+  </servlet-mapping>
+   <servlet-mapping>
+    <servlet-name>ResultRedicter</servlet-name>
+    <url-pattern>/resultServlet</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>ServerRedicter</servlet-name>
+    <url-pattern>/serverRedicter</url-pattern>
+  </servlet-mapping>
+   <servlet-mapping>
+    <servlet-name>ServerResultRedicter</servlet-name>
+    <url-pattern>/serverResultServlet</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>CookieServlet</servlet-name>
+    <url-pattern>/cookie</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>ReadCookieServlet</servlet-name>
+    <url-pattern>/rcookie</url-pattern>
+  </servlet-mapping>
+  
+  
+  
+  
+  
+  <servlet-mapping>
+    <servlet-name>UserServlet</servlet-name>
+    <url-pattern>/userServlet</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>LoginServlet</servlet-name>
+    <url-pattern>/loginServlet</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>UploadServlet</servlet-name>
+    <url-pattern>/uploadServlet</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>FileUploadServlet</servlet-name>
+    <url-pattern>/fileUploadServlet</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>FileDownServlet</servlet-name>
+    <url-pattern>/fileDownServlet</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>NationServlet</servlet-name>
+    <url-pattern>/nationServlet</url-pattern>
+  </servlet-mapping>
+  
+  
+  <filter>
+  	<filter-name>userFilter</filter-name>
+  	<filter-class>servet.lession05.UserFilter</filter-class>
+  	<init-param>
+  		<param-name>userName</param-name>
+  		<param-value>jiaozi</param-value>
+  	</init-param>
+  </filter>
+  <filter-mapping>
+     <filter-name>userFilter</filter-name>
+     <url-pattern>/*</url-pattern>
+  </filter-mapping>
+  <filter>
+  	<filter-name>userNextFilter</filter-name>
+  	<filter-class>servet.lession05.UserNextFilter</filter-class>
+  </filter>
+  <filter-mapping>
+     <filter-name>userNextFilter</filter-name>
+     <url-pattern>/*</url-pattern>
+  </filter-mapping>
+  <listener>
+  	<listener-class>servet.lession06.ServletContextAttriListenter</listener-class>
+  </listener>
+  <!-- 注册了上下文的加载和卸载监听器 -->
+  <listener>
+  	<listener-class>servet.lession06.DataListener</listener-class>
+  </listener>
+  <listener>
+  	<listener-class>servet.lession06.HttpSessionLis</listener-class>
+  </listener>
+  
+  
+  
+  <session-config>
+  	<session-timeout>1</session-timeout>
+  </session-config>
+  
+  
+  
+  
+  
+ <welcome-file-list>
+  <welcome-file>index.html</welcome-file>
+ </welcome-file-list>
+ <login-config>
+  <auth-method>BASIC</auth-method>
+ </login-config>
+</web-app>

@@ -1,0 +1,39 @@
+一 .tomcat目录结构以及配置
+   1 tomcat的目录结构
+	   -bin 用于启动tomcat和配置jdk的参数的目录
+	   -conf 目录下的server.xml用于配置端口，虚拟目录
+	   -lib tomcat支持的javaee以及jsp转译的jar
+	   -logs tomcat启动以及运行的日制信息
+	   -temp 用于临时的保存信息  比如文件上传的临时文件 等等
+	   -webapps 用于发布javaee项目以及静态网页
+	   -work jsp转译成servlet后编辑的class文件
+   2 tomcat的配置
+        1 tomcat配置
+      	 常用的配置文件位于 conf/server.xml中
+      	  修改端口的位置:
+          <Connector port="8080" protocol="HTTP/1.1" 
+               connectionTimeout="20000" 
+               redirectPort="8443" />
+        2 myeclipse配置tomcat
+	             找到  window->preferences->myeclipse->servers->tomcat->tomcat5 
+	             选中tomcat的安装目录后 选中 enabled servers视图出现tomcat6.x
+	    3 如何将应用发布到tomcat
+	    	  直接将应用或者静态网页 拷贝到webapps目录下 即可      
+	    	  在myeclipse中 在tomcat6.x右键   add deployment添加当前的项目即可 （实际是myeclipse将项目发布到webapps目录下）
+	3  开发网页程序
+	      网页文件 可以添加到 WebRoot目录下      无需重启tomcat 直接通过 路径  http://ip：端口/上下文路径/文件名
+	    上下文路径的修改  可以直接在项目上右键修改  Myeclipse->web-context root path
+	4 javaee标准的目录结构
+	     上下文路径
+	      -WEB-INF
+	         -classes java编译后的文件
+	         -lib     java依赖的jar
+	         -web.xml  web的大脑 所有的配置 从web.xml的开始
+	      -jsp文件或者html问津
+	      
+二 比较 b/s和c/s的区别
+  brower（客户端） server
+  1 client（[gui图形界面 （swing，mfc）]）  server   	、
+  2 B/S发布到广域网   C/S发布到特定的网路 （VPN） 
+  3 C/S因为未发布到广域网 所以安全性较高
+  4 C/S程序升级 需要下载客户端 升级  B/S内容的升级是通过服务器来决定 无需升级客户端

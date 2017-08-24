@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cherry>
+<server port='8081'  type="proxy">
+    <log enableLog="true" logLevel="info" logOut="file,syso" logPath="c:/log_!yyyy!_!MM!_!dd!.log" />
+	
+	<!--
+		默认的启动线程和最大的线程数
+		sendTimeout 表示代理服务器连接后台服务器的发送超时时间
+		acceptTimeout 表示代理服务器连接上服务器后 服务器响应的时间
+		retryCount 表示无法连接时 重连的次数
+	-->
+	<thread max="50" blockMax="1000" sendTimeout="10000" acceptTimeout="10000" retryCount="3"/>
+	<!--虚拟路径映射到对应的目录下的文件-->
+	<!-- 
+		path 表示拦截的路径 /0表示拦截所有的
+		pathAppend 表示拦截到的路径后 append一个mdm
+		proxyPath 表示当前请求跳转的路径也就是后台的服务器
+		cookieName 表示前面的cookie的名称
+		strickSession表示粘性的session 不跳转到创建session的任何服务器,10.9.37.131:7080
+	 -->
+	<backApp id="mdm" path="/" pathAppend="mdm" 
+	    proxyPath="10.9.37.130:7082" cookieName="ICLOUD_SessionID_QAS" strickSession="true"
+	/>
+</server>
+</cherry>

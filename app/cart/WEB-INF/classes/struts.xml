@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.3//EN"
+    "http://struts.apache.org/dtds/struts-2.3.dtd">
+ 
+<struts >
+  <!-- 
+  	包名必须唯一   extends集成的是struts2-core-2.3.24.jar中的struts-default.xml
+   -->
+  <constant name="struts.i18n.encoding" value="UTF-8"></constant>
+  <constant name="struts.action.extension" value="do,action,htm"></constant>
+  <constant name="struts.enable.DynamicMethodInvocation" value="true"></constant>
+</struts>
+    
+    

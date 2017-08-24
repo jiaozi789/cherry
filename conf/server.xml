@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cherry>
+<!-- 
+   server配置
+     port 表示启动端口
+     type 表示发布的应用类型
+          j2ee表示j2ee项目
+          proxy表示代理
+          html表示静态html
+     protocol 表示协议 
+         http|https 默认为 http协议
+ -->
+<server port='8080' type="j2ee">
+	<!--静态网页的目录 可以用逗号隔开 根目录必须/开头-->
+	<dir name="firstApp">/app</dir>
+	<!--默认的最大的线程数和队列中允许等待的最大线程数 timeOut线程超时时间 为ms-->
+	<thread blockMax="100" max="50" timeOut="10000"/>
+	<!-- 
+		enableLog 是否启用日志
+		logLevel 日志的级别
+		logOut 存在 file 则 logPath有效 如果 是syso 则是系统输出
+		logPath 文件输出的路径 如果是相对路径 用/开头 /代表根目录 比如 /log/abc.log
+	 -->
+	<log enableLog="true" logLevel="info" logOut="file,syso" logPath="/log/log_!yyyy!_!MM!_!dd!.log" />
+	<!--虚拟路径映射到对应的目录下的文件-->
+	<!-- 
+		path 表示拦截的路径 /表示拦截所有的
+		dir 表示该请求定位到的网页的目录
+		index 表示欢迎页 
+		connection 表示是否使用长连接 keep-alive表示使用长连接  close表示不使用 用完就关闭 默认是close
+		threadMin 表示启动的线程 threadMax表示最大允许允许的线程数 如果不够等待
+		threadTimeout 表示线程超时时间
+	
+	<j2eeapp id="test" cookieName="JSESSIONID" path="/mdm" dir="E:/workspace/byd_mdm1/WebRoot" />
+	<j2eeapp id="test" cookieName="JSESSIONID" path="/ssh" dir="E:/myeclipse8Workspace/SSH/WebRoot" />
+	
+	
+	<j2eeapp id="test" cookieName="JSESSIONID" path="/test" dir="E:/myeclipse8Workspace/testjsp/WebRoot" />
+	<j2eeapp id="ssh" cookieName="JSESSIONID" path="/ssh" dir="E:/myeclipse8Workspace/SSH/WebRoot" />
+	-->
+	<j2eeapp id="qymg" cookieName="JSESSIONID" path="/q" dir="C:\Users\jiaozi\Workspaces\MyEclipse 8.5\.metadata\.me_tcat\webapps\q" />
+	
+</server>
+</cherry>

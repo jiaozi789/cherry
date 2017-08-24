@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cherry>
+<server port='8090' type="html">
+	<!--静态网页的目录 可以用逗号隔开 根目录必须/开头-->
+	<dir name="firstApp">/app</dir>
+	<!--默认的最大的线程数和队列中允许等待的最大线程数 timeOut线程超时时间 为ms-->
+	<thread blockMax="100" max="50" timeOut="10000"/>
+	<!-- 
+		enableLog 是否启用日志
+		logLevel 日志的级别
+		logOut 存在 file 则 logPath有效 如果 是syso 则是系统输出
+		logPath 文件输出的路径 如果是相对路径 用/开头 /代表根目录 比如 /log/abc.log
+	 -->
+	<log enableLog="true" logLevel="info" logOut="file,syso" logPath="/log/log_!yyyy!_!MM!_!dd!.log" />
+	<!--虚拟路径映射到对应的目录下的文件-->
+	<!-- 
+		path 表示拦截的路径 /表示拦截所有的
+		dir 表示该请求定位到的网页的目录
+		index 表示欢迎页
+		threadMin 表示启动的线程 threadMax表示最大允许允许的线程数 如果不够等待
+		threadTimeout 表示线程超时时间
+	-->
+	<app id="mdm" path="/mdm" dir="%firstApp%/icloud" index="index.html"/>
+	<app id="aaa" path="/aaa" dir="%firstApp%/aaa" index="index.html"/>
+</server>
+</cherry>
