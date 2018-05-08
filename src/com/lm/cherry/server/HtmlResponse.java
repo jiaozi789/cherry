@@ -18,6 +18,25 @@ import com.lm.cherry.tool.SystemUtils;
  * 文件名:HtmlResponse.java
  */
 public class HtmlResponse implements Response{
+	/**
+	 * 不支持长连接的写入字符串
+	 */
+	public static final String CONNECTION_CLOSE = "Connection: close\r\n";
+	/**
+	 * 支持长连接写入字符串
+	 */
+	public static final String CONNECTION_KEEP_ALIVE = "Connection: keep-alive\r\n";
+	/**
+	 * 响应的内容参数
+	 */
+	public static final String CONTENTLENGTH = "%\\{CONTENTLENGTH\\}%";
+	/**
+	 * 调转的http协议头
+	 */
+	public static final String REFERER = "Referer";
+	/**
+	 * 处理没有url的响应
+	 */
 	public void processResponse(Http11Protocal httpProtocal) throws IOException {
 		this.processResponse(httpProtocal,null);
 	}
@@ -38,7 +57,7 @@ public class HtmlResponse implements Response{
 		String file=httpProtocal.getCurProcessThread().getThreadPool().getHttpServer().getDeployFactory().getRequestFile(url);
 		File destFile=new File(file);
 		if(destFile.exists() && destFile.isDirectory()){
-			String refererPage=httpProtocal.getRequestHead().get("Referer");
+			String refererPage=httpProtocal.getRequestHead().get(REFERER);
 			if(SystemUtils.isNotEmpty(refererPage)){
 				file=httpProtocal.getCurProcessThread().getThreadPool().getHttpServer().getDeployFactory().getRequestFile(refererPage);
 			}
@@ -58,12 +77,12 @@ public class HtmlResponse implements Response{
 		//写入默认编码的普通头信息
 		out.write(reponserText.getBytes(Http11Protocal.DEFAULT_ENCODING));
 		//这里长度必须设置(长度是指 除了http头和一个换行后的 输出的文件的字节数) 不然导致浏览器出现 阻塞的问题
-		out.write((Http11Protocal.contentLength.replaceAll("%\\{CONTENTLENGTH\\}%", findFile.available()+"")).getBytes(Http11Protocal.DEFAULT_ENCODING));
+		out.write((Http11Protocal.contentLength.replaceAll(CONTENTLENGTH, findFile.available()+"")).getBytes(Http11Protocal.DEFAULT_ENCODING));
 		//告诉浏览器 这是个长连接  可以针对该socket继续发送请求
 		if(ifSocketKeepAlive){
-			out.write("Connection: keep-alive\r\n".getBytes(Http11Protocal.DEFAULT_ENCODING));
+			out.write(CONNECTION_KEEP_ALIVE.getBytes(Http11Protocal.DEFAULT_ENCODING));
 		}else{
-			out.write("Connection: close\r\n".getBytes(Http11Protocal.DEFAULT_ENCODING));
+			out.write(CONNECTION_CLOSE.getBytes(Http11Protocal.DEFAULT_ENCODING));
 		}
 		//输出一个\r\n表示 \r\n后是真正的请求数据
 		out.write(Http11Protocal.headerNext.getBytes(Http11Protocal.DEFAULT_ENCODING));

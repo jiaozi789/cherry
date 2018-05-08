@@ -27,9 +27,55 @@ import com.lm.cherry.tool.SystemUtils;
  */
 public class WorkConfig {
 	/**
+	 * server相关节点
+	 */
+	private static final String NODE_SERVER_PROTOCOL = "protocol";
+	private static final String NODE_SERVER_TYPE = "type";
+	private static final String NODE_SERVER_PORT = "port";
+	/**
+	 * 线程相关常量
+	 */
+	private static final String NODE_THREAD_RETRY_COUNT = "retryCount";
+	private static final String NODE_THREAD_ACCEPT_TIMEOUT = "acceptTimeout";
+	private static final String NODE_THREAD_SEND_TIMEOUT = "sendTimeout";
+	private static final String NODE_THREAD_MAX = "max";
+	private static final String NODE_THREAD_BLOCK_MAX = "blockMax";
+	private static final String NODE_THREAD_NAME = "name";
+	/**
+	 * root配置相关常量
+	 */
+	private static final String NODE_BACK_APP = "backApp";
+	private static final String NODE_J2EEAPP = "j2eeapp";
+	private static final String NODE_APP = "app";
+	private static final String NODE_LOG = "log";
+	private static final String NODE_THREAD = "thread";
+	private static final String NODE_DIR = "dir";
+	private static final String CHERRY_HOME = "CHERRY_HOME";
+	/**
+	 * 配置文件的服务器节点
+	 */
+	private static final String NODE_SERVER = "server";
+	/**
+	 * 错误常量
+	 */
+	private static final String ERROR_NOT_DEF = "未定义server节点";
+	private static final String ERROR_NOT_FOUND = "未找到配置文件";
+	/**
+	 * 路径标准化符号
+	 */
+	private static final String REGEX = "\\\\";
+	/**
+	 * 路径分隔符
+	 */
+	private static final String REPLACEMENT = "/";
+	/**
+	 * 用户操作目录
+	 */
+	private static final String USER_DIR = "user.dir";
+	/**
 	 * 初始化xml文件的位置
 	 */
-	private static String xmlPath="conf/server.xml";
+	private static final String xmlPath="conf/server.xml";
 	/**
 	 * 获取静态网页的app目录
 	 */
@@ -43,28 +89,28 @@ public class WorkConfig {
 	 * @throws Exception
 	 */
 	public static String getWorkConfPath() throws Exception{
-		String userDir=System.getProperty("user.dir");
-		File file=new File(userDir+"/"+xmlPath);
+		String userDir=System.getProperty(USER_DIR);
+		File file=new File(userDir+REPLACEMENT+xmlPath);
 		if(file.exists()){
-			userDir=userDir.replaceAll("\\\\", "/");
+			userDir=userDir.replaceAll(REGEX, REPLACEMENT);
 			return userDir;
 		}
-		URL url=WorkConfig.class.getResource("/"+xmlPath);
+		URL url=WorkConfig.class.getResource(REPLACEMENT+xmlPath);
 		if(url==null){
 			String jarPath=WorkConfig.class.getProtectionDomain().getCodeSource().getLocation().getPath();
-			if(jarPath.startsWith("/")){
+			if(jarPath.startsWith(REPLACEMENT)){
 				jarPath=jarPath.substring(1);
 			}
-			String workPath=jarPath.substring(0,jarPath.lastIndexOf("/"));
-			workPath=workPath.substring(0,workPath.lastIndexOf("/"));
+			String workPath=jarPath.substring(0,jarPath.lastIndexOf(REPLACEMENT));
+			workPath=workPath.substring(0,workPath.lastIndexOf(REPLACEMENT));
 			if(workPath==null){
-				throw new Exception("未找到配置文件");
+				throw new Exception(ERROR_NOT_FOUND);
 			}else{
 				return workPath;
 			}
 		}else{
-			userDir=WorkConfig.class.getResource("/").toString();
-			userDir=userDir.replaceAll("\\\\", "/");
+			userDir=WorkConfig.class.getResource(REPLACEMENT).toString();
+			userDir=userDir.replaceAll(REGEX, REPLACEMENT);
 			return userDir;
 		}
 	}
@@ -80,19 +126,19 @@ public class WorkConfig {
 			String thisHome=getWorkConfPath();
 			String absPath=path;
 			if(SystemUtils.isEmpty(path)){
-				absPath=thisHome+"/"+xmlPath;
+				absPath=thisHome+REPLACEMENT+xmlPath;
 			}
 			InputStream input=new FileInputStream(absPath);
 			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance(); 
 			DocumentBuilder db = dbf.newDocumentBuilder(); 
 			Document document = db.parse(input);
-			NodeList nodeList=document.getElementsByTagName("server");
+			NodeList nodeList=document.getElementsByTagName(NODE_SERVER);
 			if(nodeList.getLength()==0){
-				throw new Exception("未定义server节点");
+				throw new Exception(ERROR_NOT_DEF);
 			}
 			for(int i=0;i<nodeList.getLength();i++){
 				Node node=nodeList.item(i);
-				if(node.getNodeName().equals("server")){
+				if(node.getNodeName().equals(NODE_SERVER)){
 					entry.add(getServerDefine(node));
 				}
 			}
@@ -112,42 +158,42 @@ public class WorkConfig {
 	public static Entry getServerDefine(Node node) throws Exception{
 		Entry edir=new Entry();
 		Entry.Dir home=new Entry.Dir();
-		home.setName("CHERRY_HOME");
+		home.setName(CHERRY_HOME);
 		home.setPath(getWorkConfPath());
 		edir.getDir().add(home);
-		edir.setPort(Integer.parseInt(node.getAttributes().getNamedItem("port").getNodeValue()));
-		edir.setType(node.getAttributes().getNamedItem("type").getNodeValue());
-		edir.setProtocol(node.getAttributes().getNamedItem("protocol").getNodeValue());
+		edir.setPort(Integer.parseInt(node.getAttributes().getNamedItem(NODE_SERVER_PORT).getNodeValue()));
+		edir.setType(node.getAttributes().getNamedItem(NODE_SERVER_TYPE).getNodeValue());
+		edir.setProtocol(node.getAttributes().getNamedItem(NODE_SERVER_PROTOCOL).getNodeValue());
 		NodeList nodeList=node.getChildNodes();
 		for(int i=0;i<nodeList.getLength();i++){
 			Node node1=nodeList.item(i);
 			Entry entry=new Entry();
-			if(node1.getNodeName().equals("dir")){
+			if(node1.getNodeName().equals(NODE_DIR)){
 				Entry.Dir ed=getDirDefine(node1);
 				if(ed!=null)
 					edir.getDir().add(ed);
 			}
-			if(node1.getNodeName().equals("thread")){
+			if(node1.getNodeName().equals(NODE_THREAD)){
 				Entry.Thread ed=getThreadDefind(node1);
 				if(ed!=null)
 					edir.setThread(ed);
 			}
-			if(node1.getNodeName().equals("log")){
+			if(node1.getNodeName().equals(NODE_LOG)){
 				Entry.LogC ed=getLogDefine(node1);
 				if(ed!=null)
 					edir.setLog(ed);
 			}
-			if(node1.getNodeName().equals("app")){
+			if(node1.getNodeName().equals(NODE_APP)){
 				Entry.App ed=getAppDefind(node1);
 				if(ed!=null)
 					edir.getApps().add(ed);
 			}
-			if(node1.getNodeName().equals("j2eeapp")){
+			if(node1.getNodeName().equals(NODE_J2EEAPP)){
 				Entry.J2EEApp ed=getJ2eeAppDefind(node1);
 				if(ed!=null)
 					edir.getJ2eeapps().add(ed);
 			}
-			if(node1.getNodeName().equals("backApp")){
+			if(node1.getNodeName().equals(NODE_BACK_APP)){
 				Entry.BackApp ed=getBackAppDefind(node1);
 				if(ed!=null)
 					edir.getBapps().add(ed);
@@ -165,7 +211,7 @@ public class WorkConfig {
 	 */
 	public static Entry.Dir getDirDefine(Node node){
 		Entry.Dir edir=new Entry.Dir();
-		edir.setName(node.getAttributes().getNamedItem("name").getNodeValue());
+		edir.setName(node.getAttributes().getNamedItem(NODE_THREAD_NAME).getNodeValue());
 		edir.setPath(node.getFirstChild().getNodeValue());
 		return edir;
 	}
@@ -196,22 +242,22 @@ public class WorkConfig {
 	 */
 	public static Entry.Thread getThreadDefind(Node node){
 		Entry.Thread ek=new Entry.Thread();
-		Node minNode=node.getAttributes().getNamedItem("blockMax");
+		Node minNode=node.getAttributes().getNamedItem(NODE_THREAD_BLOCK_MAX);
 		if(minNode!=null)
 			ek.setBlockMax(Integer.parseInt(minNode.getNodeValue()));
-		Node maxNode=node.getAttributes().getNamedItem("max");
+		Node maxNode=node.getAttributes().getNamedItem(NODE_THREAD_MAX);
 		if(maxNode!=null)
 			ek.setMax(Integer.parseInt(maxNode.getNodeValue()));
 		
-		Node sendTimeoutNode=node.getAttributes().getNamedItem("sendTimeout");
+		Node sendTimeoutNode=node.getAttributes().getNamedItem(NODE_THREAD_SEND_TIMEOUT);
 		if(sendTimeoutNode!=null)
 			ek.setSendTimeout(Integer.parseInt(sendTimeoutNode.getNodeValue()));
 		
-		Node acceptTimeoutNode=node.getAttributes().getNamedItem("acceptTimeout");
+		Node acceptTimeoutNode=node.getAttributes().getNamedItem(NODE_THREAD_ACCEPT_TIMEOUT);
 		if(acceptTimeoutNode!=null)
 			ek.setAcceptTimeout(Integer.parseInt(acceptTimeoutNode.getNodeValue()));
 		
-		Node retryCountNode=node.getAttributes().getNamedItem("retryCount");
+		Node retryCountNode=node.getAttributes().getNamedItem(NODE_THREAD_RETRY_COUNT);
 		if(retryCountNode!=null)
 			ek.setRetryCount(Integer.parseInt(retryCountNode.getNodeValue()));
 		return ek;

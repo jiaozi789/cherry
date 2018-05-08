@@ -8,7 +8,10 @@ import com.lm.cherry.conf.WorkConfig;
 import com.lm.cherry.tool.CherryException;
 
 /**
- * 启动类 作者:LM 创建日期:2015-1-5下午06:51:24gi 项目名称:cherry 包名称:com.lm.cherry.server
+ * 启动类 作者:LM 
+ * 创建日期:2015-1-5下午06:51:24gi 
+ * 项目名称:cherry 
+ * 包名称:com.lm.cherry.server
  * 文件名:Catalina.java
  */
 public class Catalina {

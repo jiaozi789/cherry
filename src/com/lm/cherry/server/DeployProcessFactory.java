@@ -17,12 +17,20 @@ import com.lm.cherry.tool.SystemUtils;
  * 文件名:DeployProcessFactory.java
  */
 public class DeployProcessFactory {
+	private static final String SEPARATE_STR2 = "\\\\{1,}";
+	private static final String SEPARATE_STR1 = "/{1,}";
+	private static final String WEB_INF_WEB_XML = "/WEB-INF/web.xml";
+	private static final String PATH_PREFIX = "/";
+	/**
+	 * 参数的开始和结束符 比如 %abc%
+	 */
+	private static final String PARAM_FLAG = "%";
 	private HttpServer server;
 	public DeployProcessFactory(HttpServer server){
 		this.server=server;
 	}
 	/**
-	 * 发布的对象缓存
+	 * 发布的应用缓存
 	 */
 	public static  List<Entry.App> eas=new ArrayList<Entry.App>();
 	public static List<Entry.BackApp> ebs=new ArrayList<Entry.BackApp>();
@@ -37,7 +45,7 @@ public class DeployProcessFactory {
 		
 		List<Entry.Dir> dirs=server.getEntry().getDir();
 		for(Entry.Dir ed:dirs){
-			String dir=ea.getDir().replaceAll("%"+ed.getName()+"%", ed.getPath());
+			String dir=ea.getDir().replaceAll(PARAM_FLAG+ed.getName()+PARAM_FLAG, ed.getPath());
 			ea.setDir(dir);
 		}
 		eas.add(ea);
@@ -52,20 +60,20 @@ public class DeployProcessFactory {
 	public void processDeploy(Entry.J2EEApp ea,ClassLoader parent) throws Exception{	
 		List<Entry.Dir> dirs=server.getEntry().getDir();
 		for(Entry.Dir ed:dirs){
-			String dir=ea.getDir().replaceAll("%"+ed.getName()+"%", ed.getPath());
-			dir=dir.replaceAll("\\\\{1,}", "/").replaceAll("/{1,}", "/");
+			String dir=ea.getDir().replaceAll(PARAM_FLAG+ed.getName()+PARAM_FLAG, ed.getPath());
+			dir=dir.replaceAll(SEPARATE_STR2, PATH_PREFIX).replaceAll(SEPARATE_STR1, PATH_PREFIX);
 			ea.setDir(dir);
 		}
-		if(ea.getDir().startsWith("/")){
+		if(ea.getDir().startsWith(PATH_PREFIX)){
 			if(SystemUtils.isEmpty(ea.getPath())){
-				String[] split=ea.getDir().split("/");
-				String contextPath="/"+split[split.length-1];
+				String[] split=ea.getDir().split(PATH_PREFIX);
+				String contextPath=PATH_PREFIX+split[split.length-1];
 				ea.setPath(contextPath);
 			}
 		}
 		//这里发布的应用也有可能是个静态的网页 而不是一个标准的web应用 这时判断 WEB-INF和web.xml是否存在
 		String realDir=ea.getDir();
-		File dirFile=new File(realDir+"/WEB-INF/web.xml");
+		File dirFile=new File(realDir+WEB_INF_WEB_XML);
 		//发布j2ee应用
 		if(dirFile.exists()){
 			J2EELoader j2eeLoader=new J2EELoader(ea,parent,server);
@@ -118,23 +126,23 @@ public class DeployProcessFactory {
 	 */
 	public static Object searchApp(String path){
 		for(Entry.App ea :eas){
-			if(path.startsWith(ea.getPath()+"/") || path.equals(ea.getPath())){
+			if(path.startsWith(ea.getPath()+PATH_PREFIX) || path.equals(ea.getPath())){
 				return ea;
 			}
 		}
 		for(Entry.BackApp eb :ebs){
-			if(eb.getPath().equals("/")){
+			if(eb.getPath().equals(PATH_PREFIX)){
 				return eb;
 			}
-			if(path.startsWith(eb.getPath()+"/") || path.equals(eb.getPath())){
+			if(path.startsWith(eb.getPath()+PATH_PREFIX) || path.equals(eb.getPath())){
 				return eb;
 			}
 		}
 		for(Entry.J2EEApp eb :j2eeapps){
-			if(eb.getPath().equals("/")){
+			if(eb.getPath().equals(PATH_PREFIX)){
 				return eb;
 			}
-			if(path.startsWith(eb.getPath()+"/") || path.equals(eb.getPath())){
+			if(path.startsWith(eb.getPath()+PATH_PREFIX) || path.equals(eb.getPath())){
 				return eb;
 			}
 		}
@@ -155,13 +163,13 @@ public class DeployProcessFactory {
 			String dir=app.getDir();
 			String file=dir;
 			if(url.equals(path)){
-				file+="/"+app.getIndex();
+				file+=PATH_PREFIX+app.getIndex();
 			}else{
 				String pathNext=url.split(path)[1];
-				if("/".equals(pathNext) || "".equals(pathNext)){
-					file+="/"+app.getIndex();
+				if(PATH_PREFIX.equals(pathNext) || "".equals(pathNext)){
+					file+=PATH_PREFIX+app.getIndex();
 				}else{
-					file+="/"+pathNext;
+					file+=PATH_PREFIX+pathNext;
 				}
 			}
 			return file;
@@ -171,16 +179,16 @@ public class DeployProcessFactory {
 			String dir=app.getDir();
 			String file=dir;
 			if(url.equals(path)){
-				file+="/"+app.getIndex();
+				file+=PATH_PREFIX+app.getIndex();
 			}else{
 				int startPos=url.indexOf(path)+path.length();
 				String pathNext=url.substring(startPos);
-				if("/".equals(pathNext) || "".equals(pathNext)){
+				if(PATH_PREFIX.equals(pathNext) || "".equals(pathNext)){
 					if(app.getIndex()!=null){
-						file+="/"+app.getIndex();
+						file+=PATH_PREFIX+app.getIndex();
 					}
 				}else{
-					file+="/"+pathNext;
+					file+=PATH_PREFIX+pathNext;
 				}
 			}
 			return file;

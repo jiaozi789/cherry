@@ -35,6 +35,14 @@ import com.lm.cherry.tool.ReverseUtils;
  * 文件名:HtmlResponse.java
  */
 public class J2EEResponse implements Response{
+	/**
+	 * 执行的servlet初始化方法
+	 */
+	private static final String INIT = "init";
+	/**
+	 * 执行的servlet的实际方法
+	 */
+	private static final String SERVICE = "service";
 	private HtmlResponse hp=new HtmlResponse();
 	/**
 	 * 处理html http协议的响应
@@ -64,7 +72,7 @@ public class J2EEResponse implements Response{
 		Object jspObject=jspLoader.load(url);
 		CherryServletConfig servletConfig=new CherryServletConfig(loader.getServletContext());
 		ReverseUtils.invoke(jspObject, 
-				"init",new Object[]{servletConfig}
+				INIT,new Object[]{servletConfig}
 				,new Class[]{ServletConfig.class});
 		Object[] param=new Object[]{
 				request,response
@@ -73,7 +81,7 @@ public class J2EEResponse implements Response{
 				HttpServletRequest.class,
 				HttpServletResponse.class
 		};
-		ReverseUtils.invoke(jspObject, "service", param , clsParam);
+		ReverseUtils.invoke(jspObject, SERVICE, param , clsParam);
 		return jspObject;
 	}
 	/**
@@ -90,7 +98,7 @@ public class J2EEResponse implements Response{
 		HttpServlet servlet=loader.getServletLoader().getServlet(url);
 		if(servlet!=null){
 			Method method=null;
-			method=servlet.getClass().getMethod("service", ServletRequest.class,ServletResponse.class);
+			method=servlet.getClass().getMethod(SERVICE, ServletRequest.class,ServletResponse.class);
 //			if("GET".equals(httpProtocal.getRequestMethod()))
 //				method=servlet.getClass().getMethod("doGet", HttpServletRequest.class,HttpServletResponse.class);
 //			else{
@@ -135,9 +143,9 @@ public class J2EEResponse implements Response{
 		boolean ifSocketKeepAlive=httpProtocal.ifSupportKeepLive();
 		//告诉浏览器 这是个长连接  可以针对该socket继续发送请求
 		if(ifSocketKeepAlive){
-			out.write("Connection: keep-alive\r\n".getBytes(Http11Protocal.DEFAULT_ENCODING));
+			out.write(HtmlResponse.CONNECTION_KEEP_ALIVE.getBytes(Http11Protocal.DEFAULT_ENCODING));
 		}else{		   
-			out.write("Connection: close\r\n".getBytes(Http11Protocal.DEFAULT_ENCODING));
+			out.write(HtmlResponse.CONNECTION_CLOSE.getBytes(Http11Protocal.DEFAULT_ENCODING));
 		}
 		//输出一个\r\n表示 \r\n后是真正的请求数据
 		out.write(Http11Protocal.headerNext.getBytes(Http11Protocal.DEFAULT_ENCODING));
@@ -278,7 +286,7 @@ public class J2EEResponse implements Response{
 		if(thisApp.getJ2eeLoder().getWebParse().getMimeMapping().size()>0){
 				String contextTypeFind=ContextTypeMap.getFileType(url,thisApp.getJ2eeLoder().getWebParse().getMimeMapping());
 				if(contextTypeFind!=null){
-					httpProtocal.getResponseHead().put("Content-Type", contextTypeFind);
+					httpProtocal.getResponseHead().put(Http11Protocal.HTTP_CONTENT_TYPE, contextTypeFind);
 				}
 		}
 		ServerWrapper.getCurrentServer().getLog().debug("写入流");

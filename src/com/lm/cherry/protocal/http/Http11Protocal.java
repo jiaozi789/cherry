@@ -20,8 +20,42 @@ import com.lm.cherry.server.error.HttpError;
 import com.lm.cherry.server.thread.ProcessScoketThread;
 import com.lm.cherry.tool.SystemUtils;
 
-
+/**
+ * http协议相关的封装
+ * 作者:LM
+ * 创建日期:2014-12-31下午04:10:30
+ * 项目名称:cherry
+ * 包名称:com.lm.cherry.work
+ * 文件名:WorkConfig.java
+ */
 public class Http11Protocal implements Protocal{
+
+	public static final String HTTP_COOKIE = "Cookie";
+	public static final String HTTP_JSESSIONID = "JSESSIONID";
+	/**
+	 * http 键值对处理的分隔符
+	 */
+	public static final String HTTP_PARAMFILENAME = "filename";
+	public static final String HTTP_PARAM_NAME = "name";
+	public static final String REPLACEMENT_END = ";";
+	public static final String HTTP_BOUNDARY = "boundary=";
+	public static final String REPLACEMENT_NULL = "";
+	public static final String HTTP_CONTENT_TYPE = "Content-Type";
+	public static final String PARAM_EQ_REGEX = "=";
+	public static final String PARAM_SPLIT_REGEX = "&";
+	public static final String PARAM_REGEX = "\\?";
+	public static final String HTTP_CONNECTION = "Connection";
+	public static final String HTTP_KEEP_ALIVE = "keep-alive";
+	public static final String POSTDATA_KEY = "POSTDATA";
+	public static final String SPLIT_REGEX2 = ":";
+	public static final String SPLIT_REGEX = ": ";
+	public static final String SPACE_REGEX = " ";
+	public static final String NEXT_REGEX = "\r\n";
+	public static final String HTTP_METHOD_POST = "POST";
+	public static final String HTTP_METHOD_GET = "GET";
+	/**
+	 * 状态码定义
+	 */
 	public static Map statusMap=new HashMap();
 	static{
 		statusMap.put("100","Continue");
@@ -115,7 +149,7 @@ public class Http11Protocal implements Protocal{
 	/**
 	 * 设置响应头后 不设置这个换行 会没法写入到浏览器
 	 */
-	public static String headerNext="\r\n";
+	public static String headerNext=NEXT_REGEX;
 	/**
 	 * 默认的字符集
 	 */
@@ -140,19 +174,19 @@ public class Http11Protocal implements Protocal{
 	/**
 	 * 请求的method的类型
 	 */
-	private String requestMethod="GET";
+	private String requestMethod=HTTP_METHOD_GET;
 	/**
 	 * 请求的虚拟路径
 	 */
-	private String requestUrl="";
+	private String requestUrl=REPLACEMENT_NULL;
 	/**
 	 * 被包含的页面
 	 */
-	private String includeUrl="";
+	private String includeUrl=REPLACEMENT_NULL;
 	/**
 	 * 被包含的页面
 	 */
-	private String forwardUrl="";
+	private String forwardUrl=REPLACEMENT_NULL;
 	/**
 	 * 请求的内容字节
 	 */
@@ -160,7 +194,7 @@ public class Http11Protocal implements Protocal{
 	/**
 	 * 请求的内容文本
 	 */
-	private String requestContent="";
+	private String requestContent=REPLACEMENT_NULL;
 	/**
 	 * 这个表示客户端是否支持长连接
 	 */
@@ -208,46 +242,46 @@ public class Http11Protocal implements Protocal{
 	 */
 	public void parse(String line){
 		requestContent=line;
-		String[] split=line.split("\r\n");
+		String[] split=line.split(NEXT_REGEX);
 		for(String tsplit:split){
 			if(!SystemUtils.isEmpty(tsplit)){
 				boolean ifGetOrPost=false;
-				if(tsplit.startsWith("GET")){
-					requestMethod="GET";
+				if(tsplit.startsWith(HTTP_METHOD_GET)){
+					requestMethod=HTTP_METHOD_GET;
 					ifGetOrPost=true;
 				}
-				else if(tsplit.startsWith("POST")){
-					requestMethod="POST";
+				else if(tsplit.startsWith(HTTP_METHOD_POST)){
+					requestMethod=HTTP_METHOD_POST;
 					ifGetOrPost=true;
 				}
 				if(ifGetOrPost){
-					requestUrl=tsplit.split(" ")[1];
+					requestUrl=tsplit.split(SPACE_REGEX)[1];
 				}else{
-					if(tsplit.indexOf(": ")>=0){
-						String[] thSplit=tsplit.split(": ");
-						requestHead.put(thSplit[0],thSplit[1].replace("\r\n", ""));
+					if(tsplit.indexOf(SPLIT_REGEX)>=0){
+						String[] thSplit=tsplit.split(SPLIT_REGEX);
+						requestHead.put(thSplit[0],thSplit[1].replace(NEXT_REGEX, REPLACEMENT_NULL));
 					}else{
-						if(requestMethod.equals("POST")){
-							String post=requestHead.get("POSTDATA");
+						if(requestMethod.equals(HTTP_METHOD_POST)){
+							String post=requestHead.get(POSTDATA_KEY);
 							if(post==null){
 								post=tsplit;
 							}else{
-								post+="\r\n"+tsplit;
+								post+=NEXT_REGEX+tsplit;
 							}
-							requestHead.put("POSTDATA",post);
+							requestHead.put(POSTDATA_KEY,post);
 						}
 					}
 				}
 			}
 		}
 		//判断是否是长连接
-		if(requestHead.containsKey("Connection")){
-			socketKeepAlive=requestHead.get("Connection").toString().trim().equalsIgnoreCase("keep-alive")?true:false;
+		if(requestHead.containsKey(HTTP_CONNECTION)){
+			socketKeepAlive=requestHead.get(HTTP_CONNECTION).toString().trim().equalsIgnoreCase(HTTP_KEEP_ALIVE)?true:false;
 		}else{
 			socketKeepAlive=false;
 		}
 		//协议请求的参数以及文件
-		if("POST".equals(requestMethod)){
+		if(HTTP_METHOD_POST.equals(requestMethod)){
 			//获取post的参数
 			getPostParam();
 		}
@@ -264,13 +298,13 @@ public class Http11Protocal implements Protocal{
 	 */
 	private Map getGetParam(){
 		String url=getRequestUrl();
-		String[] split=url.split("\\?");
+		String[] split=url.split(PARAM_REGEX);
 		if(split.length>1){
 			String param=split[1];
-			split=param.split("&");
+			split=param.split(PARAM_SPLIT_REGEX);
 			for(String child:split){
-				if(child.indexOf("=")>=0){
-					String[] vkSet=child.split("=");
+				if(child.indexOf(PARAM_EQ_REGEX)>=0){
+					String[] vkSet=child.split(PARAM_EQ_REGEX);
 					paramMap.put(vkSet[0], vkSet[1]);
 				}
 			}
@@ -305,28 +339,28 @@ public class Http11Protocal implements Protocal{
 	 */
 	private void getPostParam(){
 		//Map map=new HashMap();
-		String POSTDATA=requestHead.get("POSTDATA");
-		String contentType=requestHead.get("Content-Type");
-		if(contentType.indexOf("boundary=")<0){
-			String[] split=POSTDATA.split("&");
+		String POSTDATA=requestHead.get(POSTDATA_KEY);
+		String contentType=requestHead.get(HTTP_CONTENT_TYPE);
+		if(contentType.indexOf(HTTP_BOUNDARY)<0){
+			String[] split=POSTDATA.split(PARAM_SPLIT_REGEX);
 			for(String child:split){
-				if(child.indexOf("=")>=0){
-					if(!"=".equals(child)){
-						String[] vkSet=child.split("=");
-						paramMap.put(vkSet[0], vkSet.length>1?vkSet[1]:"");
+				if(child.indexOf(PARAM_EQ_REGEX)>=0){
+					if(!PARAM_EQ_REGEX.equals(child)){
+						String[] vkSet=child.split(PARAM_EQ_REGEX);
+						paramMap.put(vkSet[0], vkSet.length>1?vkSet[1]:REPLACEMENT_NULL);
 					}
 				}
 			}
 		}else{
 			//获取到分割的字符串
-			String splitStr=contentType.split("boundary=")[1];
+			String splitStr=contentType.split(HTTP_BOUNDARY)[1];
 			//利用分割的字符串切割
 			String[] split=POSTDATA.split(splitStr);
 			for(int i=0;i<split.length;i++){
 				String tmpStr=split[i];
 				if(SystemUtils.isNotEmpty(tmpStr)){
 					//用换行切割
-					String [] huanhang=tmpStr.split("\r\n");
+					String [] huanhang=tmpStr.split(NEXT_REGEX);
 					String name=null;
 					String fileName=null;
 					boolean ifNextValue=false;
@@ -335,22 +369,22 @@ public class Http11Protocal implements Protocal{
 					for(int s=0;s<huanhang.length;s++){
 						if(!ifNextValue){
 							if(huanhang[s].startsWith("Content-Disposition")){
-								String[] conteSplit=huanhang[s].split(";");
+								String[] conteSplit=huanhang[s].split(REPLACEMENT_END);
 								for(String conteS:conteSplit){
 									conteS=conteS.trim();
-									if(conteS.indexOf("=")>=0){
-										if(conteS.split("=")[0].equals("name")){
-											name=conteS.split("=")[1];
-											name=name.replaceAll("\"", "");
+									if(conteS.indexOf(PARAM_EQ_REGEX)>=0){
+										if(conteS.split(PARAM_EQ_REGEX)[0].equals(HTTP_PARAM_NAME)){
+											name=conteS.split(PARAM_EQ_REGEX)[1];
+											name=name.replaceAll("\"", REPLACEMENT_NULL);
 										}
-										if(conteS.split("=")[0].equals("filename")){
-											fileName=conteS.split("=")[1];
-											fileName=fileName.replaceAll("\"", "");
+										if(conteS.split(PARAM_EQ_REGEX)[0].equals(HTTP_PARAMFILENAME)){
+											fileName=conteS.split(PARAM_EQ_REGEX)[1];
+											fileName=fileName.replaceAll("\"", REPLACEMENT_NULL);
 										}
 									}
 								}
-							}else if(huanhang[s].startsWith("Content-Type")){
-								tcontentType=huanhang[s].split(":")[1].trim();
+							}else if(huanhang[s].startsWith(HTTP_CONTENT_TYPE)){
+								tcontentType=huanhang[s].split(SPLIT_REGEX2)[1].trim();
 							}else if(SystemUtils.isEmpty(huanhang[s])){
 								ifNextValue=true;
 							}
@@ -362,8 +396,8 @@ public class Http11Protocal implements Protocal{
 						paramMap.put(name, content);
 					}else{
 						Map fileType=new HashMap();
-						fileType.put("filename", fileName);
-						fileType.put("Content-Type", tcontentType);
+						fileType.put(HTTP_PARAMFILENAME, fileName);
+						fileType.put(HTTP_CONTENT_TYPE, tcontentType);
 						fileType.put("Content", content);
 						fileMap.put(name, fileType);
 					}
@@ -392,10 +426,10 @@ public class Http11Protocal implements Protocal{
 	 * @return
 	 */
 	public String getSomeValueFromAnyWhere(String cookieName){
-		String cookie=getRequestHead().get("Cookie");
+		String cookie=getRequestHead().get(HTTP_COOKIE);
 		String value=null;
 		if(SystemUtils.isEmpty(cookieName)){
-			cookieName="JSESSIONID";
+			cookieName=HTTP_JSESSIONID;
 		}
 		if(SystemUtils.isEmpty(cookie)){
 			value=getParameter(cookieName);
@@ -416,17 +450,17 @@ public class Http11Protocal implements Protocal{
 	 */
 	public String getCookieValue(String cookieName){
 		String value=null;
-		String cookie=getRequestHead().get("Cookie");
+		String cookie=getRequestHead().get(HTTP_COOKIE);
 		if(SystemUtils.isEmpty(cookieName)){
-			cookieName="JSESSIONID";
+			cookieName=HTTP_JSESSIONID;
 		}
 		//如果cookie中不存在 请求参数中获取
 		if(SystemUtils.isNotEmpty(cookie) ){
 			if(cookie.indexOf(cookieName)>=0){
-				String[] fenhao=cookie.split(";");
+				String[] fenhao=cookie.split(REPLACEMENT_END);
 				for(String child:fenhao){
-					if(child.trim().indexOf(cookieName+"=")==0){
-						value=child.split(cookieName+"=")[1].trim();
+					if(child.trim().indexOf(cookieName+PARAM_EQ_REGEX)==0){
+						value=child.split(cookieName+PARAM_EQ_REGEX)[1].trim();
 					}
 				}
 			}
@@ -446,7 +480,7 @@ public class Http11Protocal implements Protocal{
 		Object acceptLanguage=requestHead.get("Accept-Language");
 		byte[] contentByte=content.getBytes(DEFAULT_ENCODING);
 		sbf.append(statusCode.replaceAll("%\\{STATUS\\}%", "200").replaceAll("%\\{STATUSTEXT\\}%", statusMap.get("200").toString()));
-		sbf.append(contentLength.replaceAll("%\\{CONTENTLENGTH\\}%", content.length()+""));
+		sbf.append(contentLength.replaceAll("%\\{CONTENTLENGTH\\}%", content.length()+REPLACEMENT_NULL));
 		if(SystemUtils.isEmpty(contentType))
 			sbf.append(contentType.replaceAll("%\\{CONTENTTYPE\\}%", "text/html;charset=UTF-8"));
 		else{
@@ -472,15 +506,15 @@ public class Http11Protocal implements Protocal{
 		StringBuffer sbf=new StringBuffer();
 		Integer[] contentByte=new Integer[responseContentByte.size()];
 		responseContentByte.toArray(contentByte);
-		sbf.append(statusCode.replaceAll("%\\{STATUS\\}%", reponseStatus+"").replaceAll("%\\{STATUSTEXT\\}%",URLEncoder.encode(reponseText,"UTF-8")));
-		sbf.append(contentLength.replaceAll("%\\{CONTENTLENGTH\\}%", contentByte.length+""));
+		sbf.append(statusCode.replaceAll("%\\{STATUS\\}%", reponseStatus+REPLACEMENT_NULL).replaceAll("%\\{STATUSTEXT\\}%",URLEncoder.encode(reponseText,DEFAULT_ENCODING)));
+		sbf.append(contentLength.replaceAll("%\\{CONTENTLENGTH\\}%", contentByte.length+REPLACEMENT_NULL));
 		sbf.append(date.replaceAll("%\\{DATE\\}%",new Date().toString()));
 		sbf.append(server);
-		if(!responseHead.containsKey("Content-Type")){
-			sbf.append(contentType.replaceAll("%\\{CONTENTTYPE\\}%", "text/html;charset=UTF-8"));
+		if(!responseHead.containsKey(HTTP_CONTENT_TYPE)){
+			sbf.append(contentType.replaceAll("%\\{CONTENTTYPE\\}%", "text/html;charset="+DEFAULT_ENCODING));
 		}
 		for(String me:responseHead.keySet()){
-			sbf.append(me+":"+responseHead.get(me)+headerNext);
+			sbf.append(me+SPLIT_REGEX2+responseHead.get(me)+headerNext);
 		}
 		return sbf.toString();
 	}
@@ -495,7 +529,7 @@ public class Http11Protocal implements Protocal{
 		Object acceptLanguage=requestHead.get("Accept-Language");
 		sbf.append(statusCode.replaceAll("%\\{STATUS\\}%", "200").replaceAll("%\\{STATUSTEXT\\}%", statusMap.get("200").toString()));
 		if(SystemUtils.isEmpty(miniType))
-			sbf.append(contentType.replaceAll("%\\{CONTENTTYPE\\}%", "text/html;charset=UTF-8"));
+			sbf.append(contentType.replaceAll("%\\{CONTENTTYPE\\}%", "text/html;charset="+DEFAULT_ENCODING));
 		else{
 			sbf.append(contentType.replaceAll("%\\{CONTENTTYPE\\}%", miniType));
 		}
@@ -514,7 +548,7 @@ public class Http11Protocal implements Protocal{
 	 */
 	public void writeResponse(String content) throws IOException{
 		OutputStream os=getCurProcessThread().getSocket().getOutputStream();
-		os.write(content.getBytes("UTF-8"));
+		os.write(content.getBytes(DEFAULT_ENCODING));
 		os.flush();
 		os.close();
 		getCurProcessThread().clear();
@@ -549,8 +583,8 @@ public class Http11Protocal implements Protocal{
 	 * @throws UnknownHostException 
 	 */
 	public void sendRequest(String host) throws Exception{
-		String ip=host.split(":")[0];
-		int port=Integer.parseInt(host.split(":")[1]);
+		String ip=host.split(SPLIT_REGEX2)[0];
+		int port=Integer.parseInt(host.split(SPLIT_REGEX2)[1]);
 		//这里连接后台服务器 并且去获取到数据
 		long start=new Date().getTime();
 		Socket requestSocket = new Socket(ip, port);
@@ -576,7 +610,7 @@ public class Http11Protocal implements Protocal{
 			ba.write(bt,0,n);
 			clientOut.write(bt,0,n);
 		}	
-		String response=new String(ba.toByteArray(),"UTF-8");
+		String response=new String(ba.toByteArray(),DEFAULT_ENCODING);
 		this.getCurProcessThread().getThreadPool().getHttpServer().getLog().debug("\r\n请求："+requestContent+"\r\n响应："+response);
 		clientOut.flush();
 		bt=null;
@@ -590,12 +624,12 @@ public class Http11Protocal implements Protocal{
 	}
 	public String getRequestUrlNoParam() {
 		String url=getRequestUrl();
-		String[] split=url.split("\\?");
+		String[] split=url.split(PARAM_REGEX);
 		return split[0];
 	}
 	public String getForwardUrlNoParam() {
 		String url=getForwardUrl();
-		String[] split=url.split("\\?");
+		String[] split=url.split(PARAM_REGEX);
 		return split[0];
 	}
 	public void setRequestUrl(String requestUrl) {
@@ -666,7 +700,7 @@ public class Http11Protocal implements Protocal{
 	}
 	public String getIncludeUrlNoParam() {
 		String url=getIncludeUrl();
-		String[] split=url.split("\\?");
+		String[] split=url.split(PARAM_REGEX);
 		return split[0];
 	}
 	public void setIncludeUrl(String includeUrl) {

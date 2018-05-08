@@ -18,7 +18,23 @@ import com.lm.cherry.tool.WarUtils;
  * 文件名:HtmlHttpServer.java
  */
 public class J2EEHttpServer extends HttpServer{
+	/**
+	 * window下路径分隔符和linux下的路径分隔符
+	 */
+	private static final String PATH_SEP_WINDOW_STR = "\\";
+	private static final String PATH_SEP_STR = "/";
+	/**
+	 * 扫描的对应的包后缀
+	 */
+	private static final String WAR = ".war";
+	/**
+	 * lib库的目录 需要用到apache的 jspc 
+	 */
+	private static final String LIB = "/lib";
 	private ClassLoader pubClassLoader;
+	/**
+	 * 加载默认的javaee app路径
+	 */
 	public static final String defaultAppPath="/app";
 	public ClassLoader getPubClassLoader() {
 		return pubClassLoader;
@@ -28,8 +44,8 @@ public class J2EEHttpServer extends HttpServer{
 	}
 	public J2EEHttpServer(int port, Entry entry) throws MalformedURLException, Exception {
 		super(port, entry);
-		pubClassLoader=new CherryClassLoader.CommonClassLoader(new File(WorkConfig.getWorkConfPath()+"/lib").toURI().toURL());
-		((CherryClassLoader.CommonClassLoader)pubClassLoader).loadCommonLibrary(WorkConfig.getWorkConfPath()+"/lib");
+		pubClassLoader=new CherryClassLoader.CommonClassLoader(new File(WorkConfig.getWorkConfPath()+LIB).toURI().toURL());
+		((CherryClassLoader.CommonClassLoader)pubClassLoader).loadCommonLibrary(WorkConfig.getWorkConfPath()+LIB);
 	}
 	/**
 	 * 发布app
@@ -72,17 +88,17 @@ public class J2EEHttpServer extends HttpServer{
 				Entry.J2EEApp ea=new Entry.J2EEApp();
 				ea.setId(file.getName());
 				ea.setDir(file.getAbsolutePath());
-				ea.setPath("/"+file.getName());
+				ea.setPath(PATH_SEP_STR+file.getName());
 				deployApp(ea);
 			}else{
-				if(file.isFile() && file.getName().endsWith(".war")){
-					String fileName=file.getName().split("\\.war")[0];
-					String destDir=appHome+"/"+fileName;
+				if(file.isFile() && file.getName().endsWith(WAR)){
+					String fileName=file.getName().split(PATH_SEP_WINDOW_STR+WAR)[0];
+					String destDir=appHome+PATH_SEP_STR+fileName;
 					WarUtils.unWar(file, new File(destDir));
 					Entry.J2EEApp ea=new Entry.J2EEApp();
 					ea.setId(fileName);
 					ea.setDir(destDir);
-					ea.setPath("/"+fileName);
+					ea.setPath(PATH_SEP_STR+fileName);
 					deployApp(ea);
 				}
 			}
