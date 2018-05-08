@@ -13,7 +13,7 @@ CHERRY服务器
 ## 2.启动流程 ##
  ### 2.1 使用源代码启动 ###
 git克隆源代码  开发工具导入 （默认使用eclipse） 运行
-   ```start
+```start
   com.lm.cherry.server.Cherry  start|stop
 ```
 
