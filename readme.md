@@ -22,4 +22,5 @@ git克隆源代码  开发工具导入 （默认使用eclipse） 运行
  * 运行bin\startup.cmd 
  * 访问应用 默认端口8080  地址:ip:8080/context-path/
   eclipse发布项目插件 暂未给出 有需要联系   
+  
 作者:lm  联系方式 lixin1112003@126.com
