@@ -15,10 +15,11 @@ git克隆源代码  开发工具导入 （默认使用eclipse） 运行
   com.lm.cherry.server.Cherry  start|stop
 ```
 ### 2.2 使脚本启动 ###
-也可以自己打包然后 添加脚本方式运行 以下给出完整的打包程序 （源代码根目录下的cherry运行文件2.0.zip ） 运行流程：
+ 脚本方式运行 以下给出完整的打包程序 （源代码根目录下的cherry运行文件2.0.zip ）
+ 运行流程：
  * 解压cherry运行文件2.0.zip 
  * 部署应用到app目录 
  * 运行bin\startup.cmd 
  * 访问应用 默认端口8080  地址:ip:8080/context-path/
-  eclipse插件发布项目插件 有需要联系   
+  eclipse发布项目插件 暂未给出 有需要联系   
 作者:lm  联系方式 lixin1112003@126.com
