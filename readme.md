@@ -7,8 +7,6 @@ CHERRY服务器
    * /lib 类加载加载的第三方jar
    * /app 表示发布的网页应用或者 javaee规范的war包或目录
    * /src 表示源代码 其中包括com.lm.cherry源代码 以及javax的javaee5规范
- 源代码中未给出可执行脚本 
- 作者:lm  联系方式 lixin1112003@126.com
 
 ## 2.启动流程 ##
  ### 2.1 使用源代码启动 ###
@@ -16,8 +14,8 @@ git克隆源代码  开发工具导入 （默认使用eclipse） 运行
 ```start
   com.lm.cherry.server.Cherry  start|stop
 ```
-
-    
-    
-    
-    
+### 2.2 使脚本启动 ###
+也可以自己打包然后 添加脚本方式运行 以下给出完整的打包程序 上传到根目录 cherry运行文件2.0.zip 
+解压后 部署应用到app目录 运行bin\startup.cmd 默认端口8080
+  eclipse插件发布项目插件 有需要联系   
+作者:lm  联系方式 lixin1112003@126.com
