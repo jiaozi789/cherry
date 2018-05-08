@@ -11,7 +11,13 @@ CHERRY服务器
  作者:lm  联系方式 lixin1112003@126.com
 
 ## 2.启动流程 ##
- ### 1.1 使用源代码启动 ###
+ ### 2.1 使用源代码启动 ###
 git克隆源代码  开发工具导入 （默认使用eclipse） 运行
-   ```properties
-  com.lm.cherry.server.Cherry  start|stop
+   ```start
+  com.lm.cherry.server.Cherry  start|stop
+```
+
+    
+    
+    
+    
